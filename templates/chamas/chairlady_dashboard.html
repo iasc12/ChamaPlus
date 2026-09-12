@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Chairlady Dashboard - ChamaPlus{% endblock %}
+
+{% block content %}
+
+<div class="chairlady-dashboard">
+
+    <div class="chairlady-header">
+
+        <div>
+            <span class="section-label">CHAMA LEADERSHIP</span>
+
+            <h1>Chairlady Dashboard</h1>
+
+            <p>{{ chama.name }}</p>
+        </div>
+
+        {% include "components/back_button.html" with back_url_name="dashboard" back_label="Back" %}
+
+    </div>
+
+
+    <!-- SUMMARY -->
+    <section class="chairlady-summary">
+
+        <div class="chairlady-stat">
+            <div class="chairlady-stat-icon members">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                    <circle cx="9" cy="7" r="4"
+                            stroke="currentColor"
+                            stroke-width="1.9"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div>
+                <span>Members</span>
+                <strong>{{ member_count }}</strong>
+                <small>Active Chama membership</small>
+            </div>
+        </div>
+
+
+        <div class="chairlady-stat">
+            <div class="chairlady-stat-icon savings">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 1v22"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"/>
+                    <path d="M17 5.5c-1-1-2.7-1.5-5-1.5-3.3 0-5 1.5-5 3.5S8.7 11 12 11s5 1.5 5 3.5-1.7 3.5-5 3.5c-2.3 0-4-.5-5-1.5"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div>
+                <span>Total Savings</span>
+                <strong>KSh {{ total_savings|floatformat:2 }}</strong>
+                <small>Recorded Chama savings</small>
+            </div>
+        </div>
+
+
+        <div class="chairlady-stat">
+            <div class="chairlady-stat-icon reviews">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="17" rx="3"
+                          stroke="currentColor"
+                          stroke-width="1.9"/>
+                    <path d="M8 2v4M16 2v4M3 10h18"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"/>
+                    <path d="M8 14h3M8 17h6"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div>
+                <span>Pending Loan Reviews</span>
+                <strong>{{ pending_reviews }}</strong>
+                <small>Awaiting your decision</small>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- LOAN COMMITTEE -->
+    <section class="chairlady-card">
+
+        <div class="chairlady-card-header">
+
+            <div class="chairlady-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 5h16v14H4z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linejoin="round"/>
+                    <path d="M8 9h8M8 13h5"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div>
+                <span class="section-label">LOAN COMMITTEE</span>
+
+                <h2>Review Loan Applications</h2>
+
+                <p>
+                    Review loan applications assigned to you. Your decision is
+                    recorded separately from the Secretary and Treasurer.
+                </p>
+            </div>
+
+        </div>
+
+        <a href="{% url 'review_loans' %}" class="btn btn-primary">
+            Review Loans
+        </a>
+
+    </section>
+
+
+    <!-- APPROVAL RULE -->
+    <section class="chairlady-rule">
+
+        <div class="chairlady-rule-icon">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"
+                        stroke="currentColor"
+                        stroke-width="1.8"/>
+                <path d="M12 10v6M12 7.5v.01"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div>
+            <span class="section-label">COMMITTEE RULE</span>
+
+            <h3>Committee Approval Rule</h3>
+
+            <p>
+                A loan is approved only after all required committee members
+                approve it. If any required committee member rejects the loan,
+                the application is declined.
+            </p>
+        </div>
+
+    </section>
+
+</div>
+
+
+<style>
+.chairlady-dashboard {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+}
+
+.chairlady-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.chairlady-header h1 {
+    margin: 4px 0 0;
+    color: var(--text);
+    font-size: 30px;
+    font-weight: 850;
+    letter-spacing: -.7px;
+}
+
+.chairlady-header p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+
+/* SUMMARY */
+
+.chairlady-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.chairlady-stat {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+.chairlady-stat:hover {
+    transform: translateY(-3px);
+    border-color: #d0d5dd;
+    box-shadow: var(--shadow-md);
+}
+
+.chairlady-stat-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+}
+
+.chairlady-stat-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.chairlady-stat-icon.members {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.chairlady-stat-icon.savings {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.chairlady-stat-icon.reviews {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.chairlady-stat span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.chairlady-stat strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 850;
+    letter-spacing: -.4px;
+}
+
+.chairlady-stat small {
+    display: block;
+    margin-top: 4px;
+    color: #98a2b3;
+    font-size: 11px;
+}
+
+
+/* LOAN COMMITTEE */
+
+.chairlady-card {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+.chairlady-card:hover {
+    transform: translateY(-2px);
+    border-color: #d0d5dd;
+    box-shadow: var(--shadow-md);
+}
+
+.chairlady-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.chairlady-card-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: #f0fdf4;
+    color: var(--primary);
+}
+
+.chairlady-card-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.chairlady-card h2 {
+    margin: 4px 0 0;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.chairlady-card p {
+    max-width: 760px;
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* APPROVAL RULE */
+
+.chairlady-rule {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-lg);
+    background: #eff6ff;
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+.chairlady-rule:hover {
+    transform: translateY(-2px);
+    border-color: #93c5fd;
+    box-shadow: 0 12px 28px rgba(30,64,175,.10);
+}
+
+.chairlady-rule-icon {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.chairlady-rule-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.chairlady-rule h3 {
+    margin: 2px 0 0;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.chairlady-rule p {
+    max-width: 850px;
+    margin: 5px 0 0;
+    color: #1e40af;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+    .chairlady-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .chairlady-dashboard {
+        padding: 22px 15px 45px;
+    }
+
+    .chairlady-header h1 {
+        font-size: 25px;
+    }
+
+    .chairlady-card,
+    .chairlady-rule {
+        padding: 20px;
+    }
+
+    .chairlady-card-header {
+        gap: 11px;
+    }
+
+    .chairlady-stat {
+        padding: 18px;
+    }
+}
+</style>
+
+{% endblock %}

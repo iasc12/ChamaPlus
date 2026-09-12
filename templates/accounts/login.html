@@ -1,0 +1,45 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Login - ChamaPlus{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 480px; margin: 60px auto;">
+    <div class="card">
+
+        <h1>Welcome back</h1>
+
+        <p style="color:#667085;">
+            Login to your ChamaPlus account.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Login
+            </button>
+        </form>
+
+        <p style="margin-top:20px;">
+            Don't have an account?
+            <a href="{% url 'register' %}" style="font-weight:700;">
+                Create one
+            </a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}
+

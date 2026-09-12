@@ -1,0 +1,520 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Committee Management - ChamaPlus{% endblock %}
+
+{% block content %}
+    {% include "components/back_button.html" with back_url_name="dashboard" back_label="Back" %}
+
+
+<div style="max-width:1150px;margin:0 auto;">
+
+    <div style="margin-bottom:28px;">
+
+        <div style="
+            font-size:13px;
+            font-weight:800;
+            color:#64748b;
+            margin-bottom:6px;
+        ">
+            {{ chama.name }}
+        </div>
+
+        <h1 style="
+            margin:0 0 7px;
+            font-size:32px;
+            color:#111827;
+        ">
+            Committee Management
+        </h1>
+
+        <p style="
+            margin:0;
+            color:#64748b;
+        ">
+            Manage the Chairlady, Secretary, Treasurer and Chama members.
+        </p>
+
+    </div>
+
+
+    <!-- CURRENT COMMITTEE -->
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:18px;
+        margin-bottom:22px;
+    ">
+
+        <div class="card">
+
+            <div style="
+                width:44px;
+                height:44px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:14px;
+                background:#fef3c7;
+                margin-bottom:15px;
+                font-size:20px;
+            ">
+                ??
+            </div>
+
+            <h3 style="margin:0 0 6px;color:#111827;">
+                Chairlady
+            </h3>
+
+            <div style="
+                color:#64748b;
+                font-size:13px;
+                margin-bottom:14px;
+            ">
+                Committee leadership
+            </div>
+
+            {% if chairlady %}
+
+                <strong style="color:#111827;">
+                    {{ chairlady.user.get_full_name|default:chairlady.user.username }}
+                </strong>
+
+                <div style="
+                    color:#64748b;
+                    font-size:13px;
+                    margin-top:3px;
+                ">
+                    @{{ chairlady.user.username }}
+                </div>
+
+            {% else %}
+
+                <span style="color:#94a3b8;">
+                    Not assigned
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="card">
+
+            <div style="
+                width:44px;
+                height:44px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:14px;
+                background:#dbeafe;
+                margin-bottom:15px;
+                font-size:20px;
+            ">
+                ??
+            </div>
+
+            <h3 style="margin:0 0 6px;color:#111827;">
+                Secretary
+            </h3>
+
+            <div style="
+                color:#64748b;
+                font-size:13px;
+                margin-bottom:14px;
+            ">
+                Records and administration
+            </div>
+
+            {% if secretary %}
+
+                <strong style="color:#111827;">
+                    {{ secretary.user.get_full_name|default:secretary.user.username }}
+                </strong>
+
+                <div style="
+                    color:#64748b;
+                    font-size:13px;
+                    margin-top:3px;
+                ">
+                    @{{ secretary.user.username }}
+                </div>
+
+            {% else %}
+
+                <span style="color:#94a3b8;">
+                    Not assigned
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="card">
+
+            <div style="
+                width:44px;
+                height:44px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:14px;
+                background:#dcfce7;
+                margin-bottom:15px;
+                font-size:20px;
+            ">
+                ??
+            </div>
+
+            <h3 style="margin:0 0 6px;color:#111827;">
+                Treasurer
+            </h3>
+
+            <div style="
+                color:#64748b;
+                font-size:13px;
+                margin-bottom:14px;
+            ">
+                Savings and financial records
+            </div>
+
+            {% if treasurer %}
+
+                <strong style="color:#111827;">
+                    {{ treasurer.user.get_full_name|default:treasurer.user.username }}
+                </strong>
+
+                <div style="
+                    color:#64748b;
+                    font-size:13px;
+                    margin-top:3px;
+                ">
+                    @{{ treasurer.user.username }}
+                </div>
+
+            {% else %}
+
+                <span style="color:#94a3b8;">
+                    Not assigned
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ASSIGN ROLE -->
+
+    <div class="card" style="margin-bottom:22px;">
+
+        <h2 style="
+            margin:0 0 7px;
+            color:#111827;
+            font-size:21px;
+        ">
+            Assign Chama Role
+        </h2>
+
+        <p style="
+            margin:0 0 22px;
+            color:#64748b;
+        ">
+            Assign a person to a committee position or make them an ordinary member.
+        </p>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr auto;
+                gap:14px;
+                align-items:end;
+            ">
+
+                <div>
+
+                    <label
+                        for="user_id"
+                        style="
+                            display:block;
+                            margin-bottom:7px;
+                            font-size:13px;
+                            font-weight:800;
+                            color:#374151;
+                        "
+                    >
+                        Person
+                    </label>
+
+                    <select
+                        name="user_id"
+                        id="user_id"
+                        required
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:13px 14px;
+                            border:1px solid #d1d5db;
+                            border-radius:12px;
+                            background:#fff;
+                            font-size:15px;
+                        "
+                    >
+
+                        <option value="">
+                            Select a person
+                        </option>
+
+                        {% for user in users %}
+
+                            <option value="{{ user.id }}">
+
+                                {% if user.get_full_name %}
+                                    {{ user.get_full_name }} — @{{ user.username }}
+                                {% else %}
+                                    @{{ user.username }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="role"
+                        style="
+                            display:block;
+                            margin-bottom:7px;
+                            font-size:13px;
+                            font-weight:800;
+                            color:#374151;
+                        "
+                    >
+                        Chama Role
+                    </label>
+
+                    <select
+                        name="role"
+                        id="role"
+                        required
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:13px 14px;
+                            border:1px solid #d1d5db;
+                            border-radius:12px;
+                            background:#fff;
+                            font-size:15px;
+                        "
+                    >
+
+                        <option value="">
+                            Select role
+                        </option>
+
+                        <option value="CHAIRLADY">
+                            Chairlady
+                        </option>
+
+                        <option value="SECRETARY">
+                            Secretary
+                        </option>
+
+                        <option value="TREASURER">
+                            Treasurer
+                        </option>
+
+                        <option value="MEMBER">
+                            Ordinary Member
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="white-space:nowrap;"
+                >
+                    Save Role
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div style="
+            margin-top:18px;
+            padding:14px 16px;
+            border-radius:13px;
+            background:#f0fdf4;
+            border:1px solid #bbf7d0;
+            color:#166534;
+            font-size:13px;
+            line-height:1.5;
+        ">
+            <strong>Committee rule:</strong>
+            Chairlady, Secretary and Treasurer are full Chama members.
+            They can save and apply for loans like other members.
+            No committee member can review or approve their own loan.
+        </div>
+
+    </div>
+
+
+    <!-- ALL MEMBERS -->
+
+    <div class="card">
+
+        <h2 style="
+            margin:0 0 7px;
+            color:#111827;
+            font-size:21px;
+        ">
+            Chama Members
+        </h2>
+
+        <p style="
+            margin:0 0 20px;
+            color:#64748b;
+        ">
+            Everyone listed below is an active member of {{ chama.name }}.
+        </p>
+
+        <div style="
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+        ">
+
+            {% for membership in members %}
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    padding:15px 17px;
+                    background:#f8fafc;
+                    border-radius:14px;
+                ">
+
+                    <div>
+
+                        <div style="
+                            font-weight:800;
+                            color:#111827;
+                        ">
+                            {% if membership.user.get_full_name %}
+                                {{ membership.user.get_full_name }}
+                            {% else %}
+                                {{ membership.user.username }}
+                            {% endif %}
+                        </div>
+
+                        <div style="
+                            margin-top:3px;
+                            font-size:13px;
+                            color:#64748b;
+                        ">
+                            @{{ membership.user.username }}
+                        </div>
+
+                    </div>
+
+
+                    {% if membership.role == "CHAIRLADY" %}
+
+                        <span style="
+                            padding:6px 11px;
+                            border-radius:999px;
+                            background:#fef3c7;
+                            color:#92400e;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Chairlady
+                        </span>
+
+                    {% elif membership.role == "SECRETARY" %}
+
+                        <span style="
+                            padding:6px 11px;
+                            border-radius:999px;
+                            background:#dbeafe;
+                            color:#1e40af;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Secretary
+                        </span>
+
+                    {% elif membership.role == "TREASURER" %}
+
+                        <span style="
+                            padding:6px 11px;
+                            border-radius:999px;
+                            background:#dcfce7;
+                            color:#166534;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Treasurer
+                        </span>
+
+                    {% else %}
+
+                        <span style="
+                            padding:6px 11px;
+                            border-radius:999px;
+                            background:#f1f5f9;
+                            color:#475569;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Member
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <div style="
+                    padding:30px;
+                    text-align:center;
+                    background:#f8fafc;
+                    border-radius:14px;
+                    color:#64748b;
+                ">
+                    No active Chama members yet.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,1048 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Committee Management - ChamaPlus{% endblock %}
+
+{% block content %}
+
+<style>
+    .committee-page {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding: 0 20px 60px;
+    }
+
+    .committee-hero {
+        position: relative;
+        overflow: hidden;
+        margin-top: 18px;
+        margin-bottom: 22px;
+        padding: 28px;
+        border: 1px solid #202938;
+        border-radius: var(--radius-lg);
+        background:
+            linear-gradient(135deg, #101828 0%, #17212f 58%, #1f2937 100%);
+        color: #ffffff;
+        box-shadow: 0 18px 40px rgba(16, 24, 40, .14);
+    }
+
+    .committee-hero::after {
+        content: "";
+        position: absolute;
+        width: 270px;
+        height: 270px;
+        right: -110px;
+        top: -130px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.045);
+        pointer-events: none;
+    }
+
+    .committee-hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    .committee-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 9px;
+        color: #a7f3d0;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+    }
+
+    .committee-eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 0 4px rgba(52,211,153,.12);
+    }
+
+    .committee-hero h1 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 30px;
+        font-weight: 850;
+        letter-spacing: -.7px;
+    }
+
+    .committee-hero p {
+        max-width: 700px;
+        margin: 8px 0 0;
+        color: #cbd5e1;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .committee-name {
+        margin-bottom: 6px;
+        color: #a7f3d0;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .committee-hero-icon {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 17px;
+        background: rgba(255,255,255,.08);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+
+    .committee-hero-icon svg {
+        width: 29px;
+        height: 29px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .section-card {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 22px;
+        padding: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            border-color .2s ease;
+    }
+
+    .section-card:hover {
+        border-color: #d0d5dd;
+        box-shadow: var(--shadow-md);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 19px;
+    }
+
+    .section-eyebrow {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--primary);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        color: var(--text);
+        font-size: 19px;
+        font-weight: 850;
+        letter-spacing: -.3px;
+    }
+
+    .section-header p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .committee-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+    .role-card {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: #ffffff;
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            border-color .2s ease;
+    }
+
+    .role-card:hover {
+        transform: translateY(-3px);
+        border-color: #d0d5dd;
+        box-shadow: 0 12px 28px rgba(16,24,40,.07);
+    }
+
+    .role-card::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        opacity: 0;
+        transform: scaleX(.35);
+        transform-origin: center;
+        background: #047857;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .role-card:hover::after {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    .role-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 15px;
+        border-radius: 14px;
+    }
+
+    .role-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .chairlady-icon {
+        background: #fffbeb;
+        color: #b45309;
+    }
+
+    .secretary-icon {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .treasurer-icon {
+        background: #ecfdf3;
+        color: #047857;
+    }
+
+    .role-card h3 {
+        margin: 0;
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .role-description {
+        margin: 5px 0 16px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .role-person {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        padding-top: 14px;
+        border-top: 1px solid #f2f4f7;
+    }
+
+    .person-avatar {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #f2f4f7;
+        color: #344054;
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .person-details {
+        min-width: 0;
+    }
+
+    .person-name {
+        display: block;
+        overflow: hidden;
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .person-username {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .unassigned {
+        color: #98a2b3;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    .assign-card {
+        border-top: 3px solid #047857;
+    }
+
+    .assign-form {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: end;
+    }
+
+    .field-label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--text-soft);
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .field-select {
+        width: 100%;
+        min-height: 45px;
+        box-sizing: border-box;
+        padding: 10px 13px;
+        border: 1px solid var(--border-dark);
+        border-radius: 11px;
+        background: #ffffff;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 14px;
+        outline: none;
+        transition:
+            border-color .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .field-select:hover {
+        border-color: #98a2b3;
+    }
+
+    .field-select:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+    }
+
+    .save-role-btn {
+        white-space: nowrap;
+    }
+
+    .committee-rule {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid #bbf7d0;
+        border-radius: 13px;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .rule-icon {
+        width: 25px;
+        height: 25px;
+        flex: 0 0 25px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .rule-icon svg {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .members-list {
+        display: grid;
+        gap: 9px;
+    }
+
+    .member-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 14px 16px;
+        border: 1px solid #eef0f3;
+        border-radius: 14px;
+        background: #f8fafc;
+        transition:
+            transform .18s ease,
+            border-color .18s ease,
+            background .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .member-row:hover {
+        transform: translateY(-1px);
+        border-color: #d0d5dd;
+        background: #ffffff;
+        box-shadow: 0 6px 16px rgba(16,24,40,.05);
+    }
+
+    .member-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: #eafaf1;
+        color: #047857;
+        font-size: 13px;
+        font-weight: 850;
+    }
+
+    .member-name {
+        display: block;
+        overflow: hidden;
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .member-username {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 11px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .badge-chairlady {
+        background: #fffbeb;
+        border-color: #fde68a;
+        color: #92400e;
+    }
+
+    .badge-secretary {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .badge-treasurer {
+        background: #ecfdf3;
+        border-color: #bbf7d0;
+        color: #047857;
+    }
+
+    .badge-member {
+        background: #f2f4f7;
+        border-color: #d0d5dd;
+        color: #475467;
+    }
+
+    .members-empty {
+        padding: 35px 20px;
+        text-align: center;
+        border: 1px dashed #d0d5dd;
+        border-radius: 15px;
+        background: #f8fafc;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+        .committee-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .assign-form {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .save-role-btn {
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .committee-page {
+            padding: 0 13px 40px;
+        }
+
+        .committee-hero {
+            padding: 22px;
+            border-radius: 20px;
+        }
+
+        .committee-hero h1 {
+            font-size: 27px;
+        }
+
+        .committee-hero-icon {
+            width: 48px;
+            height: 48px;
+            flex-basis: 48px;
+        }
+
+        .committee-hero-icon svg {
+            width: 23px;
+            height: 23px;
+        }
+
+        .section-card {
+            padding: 19px;
+        }
+
+        .assign-form {
+            grid-template-columns: 1fr;
+        }
+
+        .save-role-btn {
+            grid-column: auto;
+        }
+
+        .member-row {
+            align-items: flex-start;
+        }
+
+        .role-badge {
+            align-self: center;
+        }
+
+        .committee-rule {
+            font-size: 12px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .section-card,
+        .role-card,
+        .member-row {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="committee-page">
+
+    {% include "components/back_button.html" with back_url_name="dashboard" back_label="Back" %}
+
+
+    <!-- HERO -->
+
+    <section class="committee-hero">
+
+        <div class="committee-hero-content">
+
+            <div>
+
+                <div class="committee-name">
+                    {{ chama.name }}
+                </div>
+
+                <span class="committee-eyebrow">
+                    Chama Administration
+                </span>
+
+                <h1>
+                    Committee Management
+                </h1>
+
+                <p>
+                    Manage the Chairlady, Secretary, Treasurer and
+                    Chama members.
+                </p>
+
+            </div>
+
+
+            <div class="committee-hero-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CURRENT COMMITTEE -->
+
+    <section class="section-card">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-eyebrow">Leadership</span>
+
+                <h2>Current Committee</h2>
+
+                <p>
+                    The members currently assigned to the three committee positions.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="committee-grid">
+
+
+            <!-- CHAIRLADY -->
+
+            <article class="role-card">
+
+                <div class="role-icon chairlady-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3z"></path>
+                        <path d="M5 16h14"></path>
+                        <path d="M7 20h10"></path>
+                    </svg>
+                </div>
+
+                <h3>Chairlady</h3>
+
+                <p class="role-description">
+                    Committee leadership
+                </p>
+
+                {% if chairlady %}
+
+                    <div class="role-person">
+
+                        <div class="person-avatar">
+                            {{ chairlady.user.username|first|upper }}
+                        </div>
+
+                        <div class="person-details">
+
+                            <strong class="person-name">
+                                {{ chairlady.user.get_full_name|default:chairlady.user.username }}
+                            </strong>
+
+                            <span class="person-username">
+                                @{{ chairlady.user.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="role-person">
+                        <span class="unassigned">
+                            Not assigned
+                        </span>
+                    </div>
+
+                {% endif %}
+
+            </article>
+
+
+            <!-- SECRETARY -->
+
+            <article class="role-card">
+
+                <div class="role-icon secretary-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <path d="M14 2v6h6"></path>
+                        <path d="M8 13h8"></path>
+                        <path d="M8 17h6"></path>
+                    </svg>
+                </div>
+
+                <h3>Secretary</h3>
+
+                <p class="role-description">
+                    Records and administration
+                </p>
+
+                {% if secretary %}
+
+                    <div class="role-person">
+
+                        <div class="person-avatar">
+                            {{ secretary.user.username|first|upper }}
+                        </div>
+
+                        <div class="person-details">
+
+                            <strong class="person-name">
+                                {{ secretary.user.get_full_name|default:secretary.user.username }}
+                            </strong>
+
+                            <span class="person-username">
+                                @{{ secretary.user.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="role-person">
+                        <span class="unassigned">
+                            Not assigned
+                        </span>
+                    </div>
+
+                {% endif %}
+
+            </article>
+
+
+            <!-- TREASURER -->
+
+            <article class="role-card">
+
+                <div class="role-icon treasurer-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 1v22"></path>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+
+                <h3>Treasurer</h3>
+
+                <p class="role-description">
+                    Savings and financial records
+                </p>
+
+                {% if treasurer %}
+
+                    <div class="role-person">
+
+                        <div class="person-avatar">
+                            {{ treasurer.user.username|first|upper }}
+                        </div>
+
+                        <div class="person-details">
+
+                            <strong class="person-name">
+                                {{ treasurer.user.get_full_name|default:treasurer.user.username }}
+                            </strong>
+
+                            <span class="person-username">
+                                @{{ treasurer.user.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="role-person">
+                        <span class="unassigned">
+                            Not assigned
+                        </span>
+                    </div>
+
+                {% endif %}
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- ASSIGN ROLE -->
+
+    <section class="section-card assign-card">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-eyebrow">Committee Administration</span>
+
+                <h2>Assign Chama Role</h2>
+
+                <p>
+                    Assign a person to a committee position or make them
+                    an ordinary member.
+                </p>
+            </div>
+
+        </div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="assign-form">
+
+                <div>
+
+                    <label
+                        for="user_id"
+                        class="field-label"
+                    >
+                        Person
+                    </label>
+
+                    <select
+                        name="user_id"
+                        id="user_id"
+                        required
+                        class="field-select"
+                    >
+
+                        <option value="">
+                            Select a person
+                        </option>
+
+                        {% for user in users %}
+
+                            <option value="{{ user.id }}">
+
+                                {% if user.get_full_name %}
+                                    {{ user.get_full_name }} — @{{ user.username }}
+                                {% else %}
+                                    @{{ user.username }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="role"
+                        class="field-label"
+                    >
+                        Chama Role
+                    </label>
+
+                    <select
+                        name="role"
+                        id="role"
+                        required
+                        class="field-select"
+                    >
+
+                        <option value="">
+                            Select role
+                        </option>
+
+                        <option value="CHAIRLADY">
+                            Chairlady
+                        </option>
+
+                        <option value="SECRETARY">
+                            Secretary
+                        </option>
+
+                        <option value="TREASURER">
+                            Treasurer
+                        </option>
+
+                        <option value="MEMBER">
+                            Ordinary Member
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary save-role-btn"
+                >
+                    Save Role
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div class="committee-rule">
+
+            <div class="rule-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+
+            <div>
+                <strong>Committee rule:</strong>
+                Chairlady, Secretary and Treasurer are full Chama members.
+                They can save and apply for loans like other members.
+                No committee member can review or approve their own loan.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ALL MEMBERS -->
+
+    <section class="section-card">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-eyebrow">Membership</span>
+
+                <h2>Chama Members</h2>
+
+                <p>
+                    Everyone listed below is an active member of {{ chama.name }}.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="members-list">
+
+            {% for membership in members %}
+
+                <div class="member-row">
+
+                    <div class="member-info">
+
+                        <div class="member-avatar">
+                            {% if membership.user.get_full_name %}
+                                {{ membership.user.get_full_name|first|upper }}
+                            {% else %}
+                                {{ membership.user.username|first|upper }}
+                            {% endif %}
+                        </div>
+
+                        <div>
+
+                            <strong class="member-name">
+
+                                {% if membership.user.get_full_name %}
+                                    {{ membership.user.get_full_name }}
+                                {% else %}
+                                    {{ membership.user.username }}
+                                {% endif %}
+
+                            </strong>
+
+                            <span class="member-username">
+                                @{{ membership.user.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if membership.role == "CHAIRLADY" %}
+
+                        <span class="role-badge badge-chairlady">
+                            Chairlady
+                        </span>
+
+                    {% elif membership.role == "SECRETARY" %}
+
+                        <span class="role-badge badge-secretary">
+                            Secretary
+                        </span>
+
+                    {% elif membership.role == "TREASURER" %}
+
+                        <span class="role-badge badge-treasurer">
+                            Treasurer
+                        </span>
+
+                    {% else %}
+
+                        <span class="role-badge badge-member">
+                            Member
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <div class="members-empty">
+                    No active Chama members yet.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,286 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Loan Management - ChamaPlus{% endblock %}
+
+{% block content %}
+    <a href="{% url "dashboard" %}" class="back-link">
+        <span class="back-link-icon">←</span>
+        <span>Back</span>
+    </a>
+
+
+<style>
+.loans-page {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-header p {
+    margin: 7px 0 0;
+    color: #6b7280;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 7px;
+}
+
+.stat-value {
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.loan-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 14px;
+}
+
+.loan-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.member-name {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.application-date {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.loan-amount {
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 14px;
+}
+
+.loan-purpose {
+    color: #4b5563;
+    margin-top: 7px;
+    line-height: 1.5;
+}
+
+.status {
+    display: inline-flex;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.status-approved {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.status-disbursed {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.status-completed {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.status-declined {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.review-btn {
+    display: inline-block;
+    margin-top: 17px;
+    padding: 11px 16px;
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    border-radius: 11px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.review-btn:hover {
+    background: #000;
+}
+
+@media (max-width: 800px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .loan-top {
+        flex-direction: column;
+    }
+
+    .loan-card {
+        padding: 17px;
+    }
+}
+</style>
+
+<div class="loans-page">
+
+    <div class="page-header">
+        <h1>Loan Management</h1>
+        <p>
+            View loan applications and access the committee approval workflow
+            for {{ chama.name }}.
+        </p>
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value">{{ pending_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Approved</div>
+            <div class="stat-value">{{ approved_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Disbursed</div>
+            <div class="stat-value">{{ disbursed_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value">{{ completed_count }}</div>
+        </div>
+
+    </div>
+
+    {% if loans %}
+
+        {% for loan in loans %}
+
+            <div class="loan-card">
+
+                <div class="loan-top">
+
+                    <div>
+                        <div class="member-name">
+                            {{ loan.member.username }}
+                        </div>
+
+                        <div class="application-date">
+                            Applied {{ loan.application_date }}
+                        </div>
+                    </div>
+
+                    {% if loan.status == "PENDING" %}
+                        <span class="status status-pending">
+                            Pending Committee Review
+                        </span>
+                    {% elif loan.status == "APPROVED" %}
+                        <span class="status status-approved">
+                            Approved
+                        </span>
+                    {% elif loan.status == "DISBURSED" %}
+                        <span class="status status-disbursed">
+                            Disbursed
+                        </span>
+                    {% elif loan.status == "COMPLETED" %}
+                        <span class="status status-completed">
+                            Completed
+                        </span>
+                    {% elif loan.status == "DECLINED" %}
+                        <span class="status status-declined">
+                            Declined
+                        </span>
+                    {% endif %}
+
+                </div>
+
+                <div class="loan-amount">
+                    KSh {{ loan.amount_requested|floatformat:2 }}
+                </div>
+
+                <div class="loan-purpose">
+                    {{ loan.purpose }}
+                </div>
+
+                {% if loan.status == "PENDING" %}
+
+                    <a
+                        href="{% url 'review_loan' loan.id %}"
+                        class="review-btn"
+                    >
+                        Open Committee Review
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="loan-card">
+            <div style="text-align:center;padding:35px 10px;color:#6b7280;">
+                <h3 style="color:#111827;">
+                    No loan applications yet
+                </h3>
+
+                <p>
+                    When members submit loan applications,
+                    they will appear here for committee review.
+                </p>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,796 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Approvals - ChamaPlus{% endblock %}
+
+{% block content %}
+
+<style>
+    .payment-approvals-page {
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+    .payment-approvals-hero {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+        padding: 28px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #101828 0%, #1d2939 100%);
+        color: #ffffff;
+        box-shadow: 0 12px 30px rgba(16, 24, 40, .14);
+    }
+
+    .payment-approvals-hero::after {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        right: -70px;
+        top: -80px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.08);
+        box-shadow:
+            0 0 0 30px rgba(255,255,255,.025),
+            0 0 0 60px rgba(255,255,255,.018);
+        pointer-events: none;
+    }
+
+    .payment-approvals-eyebrow {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 7px;
+        color: #98a2b3;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .payment-approvals-hero h1 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: clamp(27px, 4vw, 34px);
+        font-weight: 850;
+        letter-spacing: -.7px;
+    }
+
+    .payment-approvals-hero p {
+        position: relative;
+        z-index: 1;
+        max-width: 650px;
+        margin: 8px 0 0;
+        color: #cbd5e1;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .payment-hero-icon {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 14px;
+        background: rgba(255,255,255,.08);
+        color: #ffffff;
+    }
+
+    .payment-hero-icon svg {
+        width: 23px;
+        height: 23px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .payment-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .payment-stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-sm);
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            border-color .2s ease;
+    }
+
+    .payment-stat-card:hover {
+        transform: translateY(-2px);
+        border-color: #d0d5dd;
+        box-shadow: var(--shadow-md);
+    }
+
+    .payment-stat-card::after {
+        content: "";
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        right: -38px;
+        bottom: -42px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, .055);
+        pointer-events: none;
+    }
+
+    .payment-stat-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        background: #f0fdf4;
+        color: var(--primary);
+    }
+
+    .payment-stat-icon.pending {
+        background: #fffaeb;
+        color: #b54708;
+    }
+
+    .payment-stat-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .payment-stat-label {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .payment-stat-value {
+        display: block;
+        margin-top: 4px;
+        color: var(--text);
+        font-size: 25px;
+        font-weight: 850;
+        letter-spacing: -.5px;
+    }
+
+    .payment-stat-note {
+        display: block;
+        margin-top: 4px;
+        color: #98a2b3;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .payments-panel {
+        padding: 25px;
+    }
+
+    .payments-panel-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 21px;
+    }
+
+    .payments-panel-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 19px;
+        font-weight: 850;
+        letter-spacing: -.25px;
+    }
+
+    .payments-panel-subtitle {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .payments-count {
+        flex: 0 0 auto;
+        padding: 7px 11px;
+        border: 1px solid #fedf89;
+        border-radius: 999px;
+        background: #fffaeb;
+        color: #b54708;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .payment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .payment-item {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid #e4e7ec;
+        border-radius: 17px;
+        background: #f8fafc;
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            transform .2s ease;
+    }
+
+    .payment-item:hover {
+        transform: translateY(-1px);
+        border-color: #d0d5dd;
+        box-shadow: 0 7px 20px rgba(16, 24, 40, .07);
+    }
+
+    .payment-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #f79009;
+    }
+
+    .payment-item-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .payment-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .payment-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        background: #eaf7ee;
+        color: #166534;
+        font-size: 14px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    .payment-user-name {
+        margin: 0;
+        color: var(--text);
+        font-size: 16px;
+        font-weight: 850;
+    }
+
+    .payment-user-handle {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .payment-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 10px;
+        border: 1px solid #fedf89;
+        border-radius: 999px;
+        background: #fffaeb;
+        color: #b54708;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .payment-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .payment-details {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 19px;
+    }
+
+    .payment-detail {
+        min-width: 0;
+        padding: 13px 14px;
+        border: 1px solid #e4e7ec;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+
+    .payment-detail-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #98a2b3;
+        font-size: 10px;
+        font-weight: 850;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+
+    .payment-detail-value {
+        display: block;
+        overflow-wrap: anywhere;
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1.4;
+    }
+
+    .payment-detail-value.amount {
+        color: #166534;
+        font-size: 15px;
+        font-weight: 850;
+    }
+
+    .payment-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid #e4e7ec;
+        border-radius: 11px;
+        background: #ffffff;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .payment-note svg {
+        flex: 0 0 16px;
+        width: 16px;
+        height: 16px;
+        margin-top: 1px;
+        fill: none;
+        stroke: #667085;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .payment-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+        padding-top: 17px;
+        border-top: 1px solid #e4e7ec;
+    }
+
+    .payment-actions form {
+        margin: 0;
+    }
+
+    .payment-action svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .payment-empty {
+        padding: 50px 20px;
+        text-align: center;
+        border: 1px dashed #d0d5dd;
+        border-radius: 16px;
+        background: #f8fafc;
+    }
+
+    .payment-empty-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        margin-bottom: 14px;
+        border-radius: 16px;
+        background: #f2f4f7;
+        color: #667085;
+    }
+
+    .payment-empty-icon svg {
+        width: 25px;
+        height: 25px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .payment-empty-title {
+        color: #344054;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .payment-empty-text {
+        max-width: 430px;
+        margin: 6px auto 0;
+        color: #667085;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+        .payment-stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .payment-details {
+            grid-template-columns: 1fr;
+        }
+
+        .payments-panel {
+            padding: 20px;
+        }
+
+        .payment-approvals-hero {
+            padding: 23px;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .payment-approvals-page {
+            width: 100%;
+        }
+
+        .payment-approvals-hero {
+            border-radius: 18px;
+        }
+
+        .payments-panel-header {
+            flex-direction: column;
+        }
+
+        .payments-count {
+            align-self: flex-start;
+        }
+
+        .payment-item {
+            padding: 17px;
+        }
+
+        .payment-user {
+            width: 100%;
+        }
+
+        .payment-status {
+            margin-left: 54px;
+        }
+
+        .payment-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .payment-actions form,
+        .payment-actions .btn {
+            width: 100%;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .payment-stat-card,
+        .payment-item {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="payment-approvals-page">
+
+    {% include "components/back_button.html" with back_url_name="dashboard" back_label="Back" %}
+
+    <div style="margin-top: 18px;">
+
+        <section class="payment-approvals-hero">
+
+            <div class="payment-hero-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="M7 15h4"></path>
+                </svg>
+            </div>
+
+            <div class="payment-approvals-eyebrow">
+                System Administration
+            </div>
+
+            <h1>Payment Approvals</h1>
+
+            <p>
+                Review and confirm member platform-access payments before
+                granting access to ChamaPlus.
+            </p>
+
+        </section>
+
+        <section class="payment-stat-grid">
+
+            <div class="payment-stat-card">
+
+                <div class="payment-stat-icon pending" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="8.5"></circle>
+                        <path d="M12 7.5v5l3.2 2"></path>
+                    </svg>
+                </div>
+
+                <span class="payment-stat-label">
+                    Awaiting Review
+                </span>
+
+                <span class="payment-stat-value">
+                    {{ pending_payments|length }}
+                </span>
+
+                <span class="payment-stat-note">
+                    Payments requiring confirmation
+                </span>
+
+            </div>
+
+            <div class="payment-stat-card">
+
+                <div class="payment-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                </div>
+
+                <span class="payment-stat-label">
+                    Approved Payments
+                </span>
+
+                <span class="payment-stat-value">
+                    {{ completed_count }}
+                </span>
+
+                <span class="payment-stat-note">
+                    Confirmed member access payments
+                </span>
+
+            </div>
+
+        </section>
+
+        <section class="card payments-panel">
+
+            <div class="payments-panel-header">
+
+                <div>
+                    <h2 class="payments-panel-title">
+                        Payments Awaiting Confirmation
+                    </h2>
+
+                    <p class="payments-panel-subtitle">
+                        Verify the payment details before approving access.
+                    </p>
+                </div>
+
+                {% if pending_payments %}
+                    <span class="payments-count">
+                        {{ pending_payments|length }} Pending
+                    </span>
+                {% endif %}
+
+            </div>
+
+            {% if pending_payments %}
+
+                <div class="payment-list">
+
+                    {% for payment in pending_payments %}
+
+                        <article class="payment-item">
+
+                            <div class="payment-item-top">
+
+                                <div class="payment-user">
+
+                                    <div class="payment-avatar" aria-hidden="true">
+                                        {% if payment.user.get_full_name %}
+                                            {{ payment.user.get_full_name|slice:":1" }}
+                                        {% else %}
+                                            {{ payment.user.username|slice:":1" }}
+                                        {% endif %}
+                                    </div>
+
+                                    <div>
+                                        <h3 class="payment-user-name">
+                                            {% if payment.user.get_full_name %}
+                                                {{ payment.user.get_full_name }}
+                                            {% else %}
+                                                {{ payment.user.username }}
+                                            {% endif %}
+                                        </h3>
+
+                                        <div class="payment-user-handle">
+                                            @{{ payment.user.username }}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <span class="payment-status">
+                                    <span class="payment-status-dot"></span>
+                                    Awaiting Confirmation
+                                </span>
+
+                            </div>
+
+                            <div class="payment-details">
+
+                                <div class="payment-detail">
+                                    <span class="payment-detail-label">
+                                        Amount
+                                    </span>
+
+                                    <span class="payment-detail-value amount">
+                                        KSh {{ payment.amount|floatformat:2 }}
+                                    </span>
+                                </div>
+
+                                <div class="payment-detail">
+                                    <span class="payment-detail-label">
+                                        Phone
+                                    </span>
+
+                                    <span class="payment-detail-value">
+                                        {{ payment.phone_number }}
+                                    </span>
+                                </div>
+
+                                <div class="payment-detail">
+                                    <span class="payment-detail-label">
+                                        Reference
+                                    </span>
+
+                                    <span class="payment-detail-value">
+                                        {{ payment.transaction_reference }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            {% if payment.notes %}
+
+                                <div class="payment-note">
+
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 17v-5"></path>
+                                        <path d="M12 8h.01"></path>
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                    </svg>
+
+                                    <span>
+                                        <strong>Note:</strong>
+                                        {{ payment.notes }}
+                                    </span>
+
+                                </div>
+
+                            {% endif %}
+
+                            <div class="payment-actions">
+
+                                <form
+                                    method="post"
+                                    action="{% url 'approve_payment' payment.id %}"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary payment-action"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 6 9 17l-5-5"></path>
+                                        </svg>
+                                        <span>Approve Payment</span>
+                                    </button>
+
+                                </form>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'deny_payment' payment.id %}"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger payment-action"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M6 6l12 12"></path>
+                                            <path d="M18 6 6 18"></path>
+                                        </svg>
+                                        <span>Deny Payment</span>
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="payment-empty">
+
+                    <div class="payment-empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 6 9 17l-5-5"></path>
+                        </svg>
+                    </div>
+
+                    <div class="payment-empty-title">
+                        No payments awaiting confirmation
+                    </div>
+
+                    <div class="payment-empty-text">
+                        New member payments will appear here when they
+                        require administrative confirmation.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}

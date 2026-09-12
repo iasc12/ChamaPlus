@@ -1,0 +1,372 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Review Loan - ChamaPlus{% endblock %}
+
+{% block content %}
+    <a href="{% url "loans" %}" class="back-link">
+        <span class="back-link-icon">←</span>
+        <span>Back</span>
+    </a>
+
+
+<div style="
+    max-width:900px;
+    margin:0 auto;
+    padding:30px 20px 60px;
+">
+
+    <div style="margin-bottom:25px;">
+
+        <a
+            href="{% url 'review_loans' %}"
+            style="
+                text-decoration:none;
+                color:#667085;
+                font-weight:700;
+            "
+        >
+            Back to Loan Reviews
+        </a>
+
+        <h1 style="
+            margin:18px 0 6px;
+            color:#172033;
+            font-size:30px;
+            font-weight:800;
+        ">
+            Review Loan Application
+        </h1>
+
+        <p style="
+            margin:0;
+            color:#667085;
+        ">
+            Make your committee decision on this application.
+        </p>
+
+    </div>
+
+
+    <div style="
+        background:white;
+        border:1px solid #eaecf0;
+        border-radius:16px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+            gap:22px;
+        ">
+
+            <div>
+
+                <div style="
+                    font-size:13px;
+                    color:#667085;
+                    margin-bottom:5px;
+                ">
+                    Applicant
+                </div>
+
+                <div style="
+                    font-size:19px;
+                    font-weight:800;
+                    color:#172033;
+                ">
+                    {{ loan.member.get_full_name|default:loan.member.username }}
+                </div>
+
+                <div style="
+                    color:#667085;
+                    margin-top:3px;
+                ">
+                    @{{ loan.member.username }}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div style="
+                    font-size:13px;
+                    color:#667085;
+                    margin-bottom:5px;
+                ">
+                    Amount Requested
+                </div>
+
+                <div style="
+                    font-size:23px;
+                    font-weight:800;
+                    color:#172033;
+                ">
+                    KSh {{ loan.amount_requested|floatformat:2 }}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div style="
+                    font-size:13px;
+                    color:#667085;
+                    margin-bottom:5px;
+                ">
+                    Application Date
+                </div>
+
+                <div style="
+                    font-weight:700;
+                    color:#172033;
+                ">
+                    {{ loan.application_date|date:"d M Y" }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div style="
+            margin-top:25px;
+            padding-top:20px;
+            border-top:1px solid #eaecf0;
+        ">
+
+            <div style="
+                font-size:13px;
+                color:#667085;
+                margin-bottom:7px;
+            ">
+                Loan Purpose
+            </div>
+
+            <div style="
+                color:#172033;
+                line-height:1.7;
+            ">
+                {{ loan.purpose }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div style="
+        background:white;
+        border:1px solid #eaecf0;
+        border-radius:16px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <h2 style="
+            margin:0 0 20px;
+            color:#172033;
+            font-size:20px;
+        ">
+            Committee Decisions
+        </h2>
+
+
+        <div style="
+            display:grid;
+            gap:12px;
+        ">
+
+            {% for item in approvals %}
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    padding:15px;
+                    background:#f8f9fb;
+                    border-radius:10px;
+                    flex-wrap:wrap;
+                ">
+
+                    <div>
+
+                        <div style="
+                            font-weight:800;
+                            color:#172033;
+                        ">
+                            {{ item.get_reviewer_role_display }}
+                        </div>
+
+                        <div style="
+                            font-size:13px;
+                            color:#667085;
+                            margin-top:3px;
+                        ">
+                            {{ item.reviewer.get_full_name|default:item.reviewer.username }}
+                        </div>
+
+                    </div>
+
+
+                    {% if item.decision == "APPROVED" %}
+
+                        <span style="
+                            background:#ecfdf3;
+                            color:#027a48;
+                            padding:7px 12px;
+                            border-radius:20px;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Approved
+                        </span>
+
+                    {% elif item.decision == "REJECTED" %}
+
+                        <span style="
+                            background:#fef3f2;
+                            color:#b42318;
+                            padding:7px 12px;
+                            border-radius:20px;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span style="
+                            background:#fffaeb;
+                            color:#b54708;
+                            padding:7px 12px;
+                            border-radius:20px;
+                            font-size:12px;
+                            font-weight:800;
+                        ">
+                            Pending
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <div style="
+        background:white;
+        border:1px solid #eaecf0;
+        border-radius:16px;
+        padding:25px;
+    ">
+
+        <h2 style="
+            margin:0 0 8px;
+            color:#172033;
+            font-size:20px;
+        ">
+            Your Decision
+        </h2>
+
+        <p style="
+            margin:0 0 20px;
+            color:#667085;
+            line-height:1.6;
+        ">
+            You are reviewing this loan as
+            <strong>{{ membership.get_role_display }}</strong>.
+        </p>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <label style="
+                display:block;
+                font-weight:700;
+                color:#172033;
+                margin-bottom:7px;
+            ">
+                Review Notes
+            </label>
+
+            <textarea
+                name="notes"
+                rows="4"
+                placeholder="Optional notes about your decision..."
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    border:1px solid #d0d5dd;
+                    border-radius:9px;
+                    padding:12px;
+                    font-family:inherit;
+                    resize:vertical;
+                    margin-bottom:18px;
+                "
+            ></textarea>
+
+
+            <div style="
+                display:flex;
+                gap:12px;
+                flex-wrap:wrap;
+            ">
+
+                <button
+                    type="submit"
+                    name="decision"
+                    value="APPROVED"
+                    style="
+                        border:0;
+                        background:#027a48;
+                        color:white;
+                        padding:12px 22px;
+                        border-radius:9px;
+                        font-weight:800;
+                        cursor:pointer;
+                    "
+                >
+                    Approve Loan
+                </button>
+
+
+                <button
+                    type="submit"
+                    name="decision"
+                    value="REJECTED"
+                    style="
+                        border:0;
+                        background:#b42318;
+                        color:white;
+                        padding:12px 22px;
+                        border-radius:9px;
+                        font-weight:800;
+                        cursor:pointer;
+                    "
+                >
+                    Reject Loan
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+

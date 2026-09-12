@@ -1,0 +1,11 @@
+﻿{% url back_url_name as resolved_back_url %}
+
+<a href="{{ resolved_back_url }}"
+   class="chama-back-button"
+   aria-label="{{ back_label|default:'Back' }}">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+    </svg>
+
+    <span>{{ back_label|default:"Back" }}</span>
+</a>

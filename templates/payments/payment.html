@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Access Payment - ChamaPlus{% endblock %}
+
+{% block content %}
+    {% include "components/back_button.html" with back_url_name="dashboard" back_label="Back" %}
+
+
+<div style="max-width:760px; margin:40px auto;">
+
+    <div class="card">
+
+        <div style="text-align:center; margin-bottom:30px;">
+            <div style="
+                width:70px;
+                height:70px;
+                margin:0 auto 18px;
+                border-radius:50%;
+                background:#eef2ff;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:30px;
+            ">
+                KSh
+            </div>
+
+            <h1 style="margin-bottom:8px;">
+                ChamaPlus Platform Access
+            </h1>
+
+            <p style="color:#667085;">
+                Pay the KSh 20 platform access fee to continue using ChamaPlus.
+            </p>
+        </div>
+
+        {% if pending_payment %}
+
+            <div style="
+                padding:20px;
+                border-radius:12px;
+                background:#fff7ed;
+                color:#9a3412;
+                margin-bottom:25px;
+            ">
+                <strong>Payment awaiting confirmation</strong>
+
+                <p style="margin-bottom:0;">
+                    We have received your payment details.
+                    An administrator will review and confirm your payment.
+                </p>
+            </div>
+
+            <div style="
+                padding:20px;
+                background:#f8fafc;
+                border-radius:12px;
+            ">
+
+                <p>
+                    <strong>Amount:</strong>
+                    KSh {{ pending_payment.amount }}
+                </p>
+
+                <p>
+                    <strong>Phone:</strong>
+                    {{ pending_payment.phone_number }}
+                </p>
+
+                <p style="margin-bottom:0;">
+                    <strong>Reference:</strong>
+                    {{ pending_payment.transaction_reference }}
+                </p>
+
+            </div>
+
+        {% else %}
+
+            <div style="
+                padding:22px;
+                border-radius:12px;
+                background:#f8fafc;
+                margin-bottom:25px;
+            ">
+
+                <h3 style="margin-top:0;">
+                    Step 1 — Make payment
+                </h3>
+
+                <p>
+                    Send exactly:
+                </p>
+
+                <div style="
+                    font-size:30px;
+                    font-weight:800;
+                    margin:15px 0;
+                ">
+                    KSh 20
+                </div>
+
+                <p>
+                    Pay using M-Pesa to either of these ChamaPlus payment numbers:
+                </p>
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+                    gap:15px;
+                    margin-top:20px;
+                ">
+
+                    <div style="
+                        background:white;
+                        border:1px solid #e5e7eb;
+                        border-radius:12px;
+                        padding:18px;
+                        text-align:center;
+                    ">
+                        <div style="
+                            font-size:13px;
+                            color:#667085;
+                            margin-bottom:6px;
+                        ">
+                            M-Pesa Number
+                        </div>
+
+                        <strong style="font-size:22px;">
+                            0700089811
+                        </strong>
+                    </div>
+
+                    <div style="
+                        background:white;
+                        border:1px solid #e5e7eb;
+                        border-radius:12px;
+                        padding:18px;
+                        text-align:center;
+                    ">
+                        <div style="
+                            font-size:13px;
+                            color:#667085;
+                            margin-bottom:6px;
+                        ">
+                            M-Pesa Number
+                        </div>
+
+                        <strong style="font-size:22px;">
+                            0111509391
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div style="
+                padding:22px;
+                border-radius:12px;
+                background:#f8fafc;
+            ">
+
+                <h3 style="margin-top:0;">
+                    Step 2 — Submit your payment details
+                </h3>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="phone_number">
+                            Phone number used for payment
+                        </label>
+
+                        <input
+                            type="text"
+                            id="phone_number"
+                            name="phone_number"
+                            placeholder="e.g. 0712345678"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transaction_reference">
+                            M-Pesa transaction reference
+                        </label>
+
+                        <input
+                            type="text"
+                            id="transaction_reference"
+                            name="transaction_reference"
+                            placeholder="e.g. QAB123XYZ"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">
+                            Additional information
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            rows="4"
+                            placeholder="Optional"
+                        ></textarea>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        style="
+                            width:100%;
+                            margin-top:5px;
+                        "
+                    >
+                        Submit Payment for Confirmation
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+        <div style="
+            text-align:center;
+            margin-top:25px;
+        ">
+            <a
+                href="{% url 'subscription' %}"
+                class="btn btn-secondary"
+            >
+                Back to Subscription
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+
