@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -716,106 +716,207 @@
         /* =========================
            MODERN NAVIGATION
         ========================= */
-.bottom-nav {
-            position: fixed;
+        /* =========================
+           MODERN FLOATING NAVIGATION
+        ========================= */
 
+        .bottom-nav {
+            position: fixed;
             left: 0;
             right: 0;
             bottom: 0;
-
             z-index: 1000;
 
             padding:
-                10px
+                12px
                 16px
-                calc(10px + env(safe-area-inset-bottom));
+                calc(12px + env(safe-area-inset-bottom));
 
-            background: rgba(255, 255, 255, .92);
+            background: transparent;
+            border: 0;
+            box-shadow: none;
 
-            border-top: 1px solid rgba(234, 236, 240, .95);
-
-            box-shadow:
-                0 -12px 30px rgba(16, 24, 40, .07);
-
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
+            pointer-events: none;
         }
 
-
         .bottom-nav-inner {
-            width: min(650px, 100%);
-
+            width: min(680px, 100%);
             margin: 0 auto;
 
             display: grid;
-
             grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+            gap: 6px;
 
-            gap: 5px;
+            padding: 7px;
+
+            background: rgba(255, 255, 255, .94);
+            border: 1px solid rgba(208, 213, 221, .72);
+            border-radius: 28px;
+
+            box-shadow:
+                0 20px 45px rgba(16, 24, 40, .12),
+                0 5px 16px rgba(16, 24, 40, .07);
+
+            backdrop-filter: blur(22px) saturate(150%);
+            -webkit-backdrop-filter: blur(22px) saturate(150%);
+
+            pointer-events: auto;
         }
 
-
         .nav-item {
-            min-height: 60px;
+            position: relative;
+
+            min-height: 58px;
 
             display: flex;
-
             flex-direction: column;
-
             align-items: center;
-
             justify-content: center;
 
             gap: 5px;
 
-            border-radius: 14px;
+            padding: 7px 8px;
+
+            border: 1px solid transparent;
+            border-radius: 21px;
 
             color: #667085;
+            text-decoration: none;
 
             font-size: 11px;
-
             font-weight: 750;
+            line-height: 1;
 
             transition:
-                background .18s ease,
-                color .18s ease,
-                transform .18s ease;
+                background .22s ease,
+                color .22s ease,
+                border-color .22s ease,
+                box-shadow .22s ease,
+                transform .22s ease;
         }
-
 
         .nav-item:hover {
-            background: #f2f4f7;
-
+            background: #f8fafc;
             color: var(--primary);
-
-            transform: translateY(-1px);
+            border-color: #eaecf0;
+            transform: translateY(-2px);
         }
 
+        .nav-item:active {
+            transform: translateY(0) scale(.98);
+        }
 
         .nav-item.active {
             background: var(--primary-soft);
-
             color: var(--primary-dark);
-        }
+            border-color: rgba(34, 197, 94, .12);
 
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, .5),
+                0 5px 14px rgba(34, 197, 94, .08);
+        }
 
         .nav-icon {
             width: 21px;
             height: 21px;
 
+            flex: 0 0 21px;
+
             fill: none;
-
             stroke: currentColor;
-
             stroke-width: 1.9;
-
             stroke-linecap: round;
-
             stroke-linejoin: round;
+
+            transition:
+                transform .22s ease,
+                stroke-width .22s ease;
         }
 
+        .nav-item:hover .nav-icon {
+            transform: translateY(-1px) scale(1.04);
+        }
 
-        /* =========================
+        .nav-item.active .nav-icon {
+            transform: scale(1.06);
+            stroke-width: 2.05;
+        }
+
+        .nav-item:focus-visible {
+            outline: 3px solid rgba(34, 197, 94, .20);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 700px) {
+            .bottom-nav {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .bottom-nav-inner {
+                border-radius: 25px;
+                padding: 6px;
+                gap: 4px;
+            }
+
+            .nav-item {
+                min-height: 56px;
+                border-radius: 19px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .bottom-nav {
+                padding-left: 7px;
+                padding-right: 7px;
+            }
+
+            .bottom-nav-inner {
+                border-radius: 23px;
+                padding: 5px;
+                gap: 3px;
+            }
+
+            .nav-item {
+                min-height: 54px;
+                border-radius: 18px;
+                font-size: 10px;
+                gap: 4px;
+            }
+
+            .nav-icon {
+                width: 20px;
+                height: 20px;
+                flex-basis: 20px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .bottom-nav {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            .bottom-nav-inner {
+                border-radius: 21px;
+                padding: 4px;
+            }
+
+            .nav-item {
+                min-height: 52px;
+                border-radius: 16px;
+                padding-left: 4px;
+                padding-right: 4px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-item,
+            .nav-icon {
+                transition: none;
+            }
+        }
+/* =========================
            FOOTER
         ========================= */
 
@@ -960,7 +1061,7 @@
 
 <style>
 /* =========================================================
-   ChamaPlus — Universal Back Button
+   ChamaPlus â€” Universal Back Button
    ========================================================= */
 
 .chama-back-button {
@@ -1252,12 +1353,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
