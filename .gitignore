@@ -36,3 +36,6 @@ temp_*
 
 # Django collected static files
 staticfiles/
+
+# Temporary database migration fixture
+data.json
