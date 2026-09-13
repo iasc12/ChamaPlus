@@ -82,33 +82,25 @@ def get_loan_eligibility(user, chama):
 
 def create_loan_approvals(loan):
     """
-    Create one approval record for every committee officer
-    except the applicant's own committee role.
+    Create one approval record for every active committee officer.
+
+    Every loan requires decisions from:
+    - Chairlady
+    - Secretary
+    - Treasurer
     """
 
-    applicant_membership = Membership.objects.filter(
-        chama=loan.chama,
-        user=loan.member,
-        is_active=True,
-    ).first()
-
-    applicant_role = (
-        applicant_membership.role
-        if applicant_membership
-        else None
+    committee_memberships = (
+        Membership.objects
+        .filter(
+            chama=loan.chama,
+            role__in=COMMITTEE_ROLES,
+            is_active=True,
+        )
+        .select_related("user")
     )
 
-    committee_memberships = Membership.objects.filter(
-        chama=loan.chama,
-        role__in=COMMITTEE_ROLES,
-        is_active=True,
-    ).select_related("user")
-
     for membership in committee_memberships:
-
-        if membership.role == applicant_role:
-            continue
-
         LoanApproval.objects.get_or_create(
             loan=loan,
             reviewer=membership.user,
@@ -118,15 +110,38 @@ def create_loan_approvals(loan):
 
 def update_loan_status(loan):
     """
-    Recalculate the overall loan status from committee decisions.
+    Recalculate the overall loan status.
 
-    Any rejection immediately declines the loan.
+    Any rejection immediately rejects the loan.
 
-    The loan is approved only when every required committee
-    member has approved it.
+    Approval happens only after all three required committee
+    officers have approved.
     """
 
     approvals = loan.approvals.all()
+
+    required_roles = {
+        LoanApproval.ReviewerRole.CHAIRLADY,
+        LoanApproval.ReviewerRole.SECRETARY,
+        LoanApproval.ReviewerRole.TREASURER,
+    }
+
+    approval_roles = set(
+        approvals.values_list(
+            "reviewer_role",
+            flat=True,
+        )
+    )
+
+    if not required_roles.issubset(approval_roles):
+        loan.status = Loan.Status.PENDING
+        loan.save(
+            update_fields=[
+                "status",
+                "updated_at",
+            ]
+        )
+        return
 
     if approvals.filter(
         decision=LoanApproval.Decision.REJECTED
@@ -143,9 +158,16 @@ def update_loan_status(loan):
 
         return
 
-    if approvals.exists() and not approvals.filter(
-        decision=LoanApproval.Decision.PENDING
-    ).exists():
+    approved_roles = set(
+        approvals.filter(
+            decision=LoanApproval.Decision.APPROVED
+        ).values_list(
+            "reviewer_role",
+            flat=True,
+        )
+    )
+
+    if required_roles.issubset(approved_roles):
 
         loan.status = Loan.Status.APPROVED
         loan.amount_approved = loan.amount_requested
@@ -159,6 +181,17 @@ def update_loan_status(loan):
                 "updated_at",
             ]
         )
+
+        return
+
+    loan.status = Loan.Status.PENDING
+
+    loan.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
 
 
 @login_required
@@ -321,7 +354,6 @@ def apply_for_loan(request):
             )
 
         try:
-
             amount_requested = Decimal(amount)
 
         except (InvalidOperation, ValueError):
@@ -390,7 +422,7 @@ def apply_for_loan(request):
 
         messages.success(
             request,
-            "Your loan application has been submitted and is awaiting committee review.",
+            "Your loan application has been submitted and is awaiting all three committee decisions.",
         )
 
         return redirect("loans")
@@ -405,14 +437,10 @@ def apply_for_loan(request):
             "eligible_after": eligible_after,
         },
     )
-from django.http import Http404
 
 
 @login_required
 def review_loans(request):
-    """
-    Show loans that the current committee member is allowed to review.
-    """
 
     chama = get_active_chama()
 
@@ -441,6 +469,7 @@ def review_loans(request):
             chama=chama,
             status=Loan.Status.PENDING,
             approvals__reviewer=request.user,
+            approvals__reviewer_role=membership.role,
             approvals__decision=LoanApproval.Decision.PENDING,
         )
         .select_related("member")
@@ -462,9 +491,6 @@ def review_loans(request):
 
 @login_required
 def review_loan(request, loan_id):
-    """
-    Allow an eligible committee member to approve or reject a loan.
-    """
 
     chama = get_active_chama()
 
@@ -489,7 +515,10 @@ def review_loan(request, loan_id):
 
     loan = get_object_or_404(
         Loan.objects
-        .select_related("member", "chama")
+        .select_related(
+            "member",
+            "chama",
+        )
         .prefetch_related(
             "approvals__reviewer",
         ),
@@ -497,7 +526,6 @@ def review_loan(request, loan_id):
         chama=chama,
     )
 
-    # Nobody can review their own loan.
     if loan.member_id == request.user.id:
         messages.error(
             request,
@@ -570,26 +598,32 @@ def review_loan(request, loan_id):
         )
 
         update_loan_status(loan)
+        loan.refresh_from_db()
 
         if decision == LoanApproval.Decision.REJECTED:
+
             messages.error(
                 request,
-                "Loan application rejected.",
+                "Your rejection has been recorded. The loan application has been rejected.",
+            )
+
+        elif loan.status == Loan.Status.APPROVED:
+
+            messages.success(
+                request,
+                "All three committee officers have approved the loan. The loan is now approved.",
             )
 
         else:
-            loan.refresh_from_db()
 
-            if loan.status == Loan.Status.APPROVED:
-                messages.success(
-                    request,
-                    "All required committee members have approved the loan.",
-                )
-            else:
-                messages.success(
-                    request,
-                    "Your approval has been recorded. The loan is still awaiting other committee decisions.",
-                )
+            remaining = loan.approvals.filter(
+                decision=LoanApproval.Decision.PENDING,
+            ).count()
+
+            messages.success(
+                request,
+                f"Your approval has been recorded. {remaining} committee decision(s) remain.",
+            )
 
         return redirect("review_loans")
 

@@ -148,31 +148,23 @@
                 flex-wrap:wrap;
             ">
 
-                {% if is_december %}
-
-                    {% if available_balance > 0 %}
-
-                        <a
-                            href="{% url 'request_withdrawal' %}"
-                            style="
-                                display:inline-flex;
-                                align-items:center;
-                                justify-content:center;
-                                padding:12px 18px;
-                                border-radius:11px;
-                                background:#111827;
-                                color:#fff;
-                                text-decoration:none;
-                                font-size:14px;
-                                font-weight:800;
-                            "
-                        >
-                            Request Withdrawal
-                        </a>
-
-                    {% endif %}
-
-                {% endif %}
+                <a
+                    href="{% url 'request_withdrawal' %}"
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        justify-content:center;
+                        padding:12px 18px;
+                        border-radius:11px;
+                        background:#111827;
+                        color:#fff;
+                        text-decoration:none;
+                        font-size:14px;
+                        font-weight:800;
+                    "
+                >
+                    Withdraw Savings
+                </a>
 
                 <a
                     href="{% url 'withdrawal_history' %}"
@@ -205,42 +197,19 @@
     <div style="
         padding:16px 18px;
         border-radius:12px;
-        background:
-            {% if is_december %}
-                #ecfdf3;
-            {% else %}
-                #fff7ed;
-            {% endif %}
-        color:
-            {% if is_december %}
-                #027a48;
-            {% else %}
-                #9a3412;
-            {% endif %}
+        background:#fff7ed;
+        color:#9a3412;
         margin-bottom:20px;
         font-size:14px;
     ">
 
-        {% if is_december %}
+        <strong>Withdrawals are currently closed.</strong>
 
-            <strong>Savings withdrawals are currently open.</strong>
-
-            <div style="margin-top:4px;">
-                You may request a withdrawal from your available savings.
-                Your request must be reviewed by the Chama Treasurer before
-                it is approved.
-            </div>
-
-        {% else %}
-
-            <strong>Withdrawals are currently closed.</strong>
-
-            <div style="margin-top:4px;">
-                Savings withdrawals are only available during December.
-                Your savings remain recorded and protected until then.
-            </div>
-
-        {% endif %}
+        <div style="margin-top:4px;">
+            Savings withdrawals will become available after the
+            Annual General Meeting. Your savings remain recorded
+            and protected until then.
+        </div>
 
     </div>
 

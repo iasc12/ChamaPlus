@@ -3,79 +3,79 @@
 {% block title %}Subscription - ChamaPlus{% endblock %}
 
 {% block content %}
-    {% include "components/back_button.html" with back_url_name="profile" back_label="Back" %}
 
+{% include "components/back_button.html" with back_url_name="profile" back_label="Back" %}
 
-<div style="max-width: 700px; margin: 50px auto;">
+<div style="max-width:700px; margin:50px auto;">
     <div class="card">
 
         <div style="text-align:center;">
 
             <div style="
-    width:70px;
-    height:70px;
-    margin:0 auto 20px;
-    border-radius:50%;
-    background:#ecfdf3;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-">
-    <svg
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#16a34a"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-    >
-        <path d="M5 12.5l4 4L19 7"></path>
-    </svg>
-</div>
+                width:70px;
+                height:70px;
+                margin:0 auto 20px;
+                border-radius:50%;
+                background:#ecfdf3;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            ">
+                <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#16a34a"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M5 12.5l4 4L19 7"></path>
+                </svg>
+            </div>
 
-            <h1>Welcome to ChamaPlus</h1>
+            <h1>ChamaPlus Access</h1>
 
-            {% if profile.trial_expires_at %}
-                <h2>14-Day Free Trial</h2>
 
-                <p style="color:#667085; font-size:16px;">
-                    Your free access is currently active.
-                </p>
+            {% if is_system_admin %}
+
+                <!-- SYSTEM ADMINISTRATOR -->
 
                 <div style="
                     margin:25px 0;
-                    padding:20px;
-                    border-radius:12px;
-                    background:#f8fafc;
+                    padding:24px;
+                    border-radius:14px;
+                    background:#ecfdf3;
+                    border:1px solid #bbf7d0;
                     text-align:left;
                 ">
-                    <div style="margin-bottom:12px;">
-                        <strong>Trial started</strong><br>
-                        {{ profile.trial_started_at|date:"d M Y, H:i" }}
+
+                    <div style="
+                        font-size:13px;
+                        font-weight:700;
+                        color:#166534;
+                        letter-spacing:.08em;
+                        margin-bottom:8px;
+                    ">
+                        SYSTEM ADMINISTRATOR
                     </div>
 
-                    <div>
-                        <strong>Trial expires</strong><br>
-                        {{ profile.trial_expires_at|date:"d M Y, H:i" }}
-                    </div>
-                </div>
-            {% endif %}
+                    <h2 style="margin:0 0 10px;">
+                        Lifetime Free Access
+                    </h2>
 
-            {% if profile.access_active %}
-
-                <div style="
-                    margin:20px 0;
-                    padding:18px;
-                    border-radius:12px;
-                    background:#ecfdf3;
-                    color:#166534;
-                ">
-                    <strong>Your ChamaPlus access is active.</strong>
-                    <p style="margin-bottom:0;">
-                        You can continue to your main dashboard.
+                    <p style="
+                        margin:0;
+                        color:#166534;
+                        font-size:16px;
+                        line-height:1.6;
+                    ">
+                        You are the ChamaPlus System Administrator.
+                        Your platform access is permanently free.
+                        No KSh 20 monthly access fee is required.
                     </p>
+
                 </div>
 
                 <a
@@ -91,20 +91,149 @@
                     Continue to Main Dashboard
                 </a>
 
+
+            {% elif is_current_treasurer %}
+
+                <!-- CURRENT TREASURER -->
+
+                <div style="
+                    margin:25px 0;
+                    padding:24px;
+                    border-radius:14px;
+                    background:#ecfdf3;
+                    border:1px solid #bbf7d0;
+                    text-align:left;
+                ">
+
+                    <div style="
+                        font-size:13px;
+                        font-weight:700;
+                        color:#166534;
+                        letter-spacing:.08em;
+                        margin-bottom:8px;
+                    ">
+                        CHAMA TREASURER
+                    </div>
+
+                    <h2 style="margin:0 0 10px;">
+                        Lifetime Free Access
+                    </h2>
+
+                    <p style="
+                        margin:0;
+                        color:#166534;
+                        font-size:16px;
+                        line-height:1.6;
+                    ">
+                        You are the current Treasurer of this Chama.
+                        Your platform access is permanently free.
+                        No KSh 20 monthly access fee is required.
+                    </p>
+
+                </div>
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="btn btn-primary"
+                    style="
+                        display:inline-block;
+                        margin-top:10px;
+                        min-width:240px;
+                        text-align:center;
+                    "
+                >
+                    Continue to Main Dashboard
+                </a>
+
+
+            {% elif has_access %}
+
+                <!-- REGULAR MEMBER WITH ACTIVE ACCESS -->
+
+                {% if profile.trial_expires_at and not profile.platform_access_paid %}
+
+                    <h2>14-Day Free Trial</h2>
+
+                    <p style="color:#667085; font-size:16px;">
+                        Your free ChamaPlus trial is currently active.
+                    </p>
+
+                    <div style="
+                        margin:25px 0;
+                        padding:20px;
+                        border-radius:12px;
+                        background:#f8fafc;
+                        text-align:left;
+                    ">
+
+                        <div style="margin-bottom:12px;">
+                            <strong>Trial started</strong><br>
+                            {{ profile.trial_started_at|date:"d M Y, H:i" }}
+                        </div>
+
+                        <div>
+                            <strong>Trial expires</strong><br>
+                            {{ profile.trial_expires_at|date:"d M Y, H:i" }}
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div style="
+                        margin:20px 0;
+                        padding:18px;
+                        border-radius:12px;
+                        background:#ecfdf3;
+                        color:#166534;
+                    ">
+                        <strong>Your ChamaPlus access is active.</strong>
+
+                        <p style="margin-bottom:0;">
+                            Your platform subscription is active and you can
+                            continue using ChamaPlus.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="btn btn-primary"
+                    style="
+                        display:inline-block;
+                        margin-top:10px;
+                        min-width:240px;
+                        text-align:center;
+                    "
+                >
+                    Continue to Main Dashboard
+                </a>
+
+
             {% else %}
+
+                <!-- REGULAR MEMBER WITHOUT ACCESS -->
 
                 <div style="
                     margin:20px 0;
-                    padding:18px;
+                    padding:22px;
                     border-radius:12px;
                     background:#fff4e5;
                     color:#92400e;
+                    text-align:left;
                 ">
-                    <strong>Your access has expired.</strong>
-                    <p>
-                        Please pay the KSh 20 platform access fee
+
+                    <strong>Your ChamaPlus access has expired.</strong>
+
+                    <p style="
+                        margin:10px 0 0;
+                        line-height:1.6;
+                    ">
+                        Please pay the KSh 20 monthly platform access fee
                         to continue using ChamaPlus.
                     </p>
+
                 </div>
 
                 <a
@@ -127,7 +256,3 @@
 </div>
 
 {% endblock %}
-
-
-
-

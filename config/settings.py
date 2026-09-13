@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-iiduit+^ga)rcolb0feq=hh*n9u+5wgc2(-c3n6ed-5t7wfuaz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.100.11", ".trycloudflare.com"]
+
+CSRF_TRUSTED_ORIGINS = ["https://blacks-system-artists-out.trycloudflare.com"]
 
 
 # Application definition
@@ -123,6 +125,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 
 # Email

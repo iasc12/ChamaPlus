@@ -14,7 +14,7 @@ from .models import UserProfile
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("subscription")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -97,7 +97,7 @@ def register(request):
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("subscription")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -111,7 +111,7 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            return redirect("dashboard")
+            return redirect("subscription")
 
         messages.error(
             request,
@@ -127,7 +127,6 @@ def user_login(request):
 @login_required
 def user_logout(request):
     logout(request)
-
     return redirect("login")
 
 
@@ -152,6 +151,7 @@ def profile(request):
         },
     )
 
+
 @login_required
 def edit_profile(request):
     user = request.user
@@ -175,7 +175,10 @@ def edit_profile(request):
         phone_number = request.POST.get("phone_number", "").strip()
 
         if not email:
-            messages.error(request, "Email address is required.")
+            messages.error(
+                request,
+                "Email address is required.",
+            )
             return render(
                 request,
                 "accounts/edit_profile.html",
@@ -228,21 +231,128 @@ def edit_profile(request):
         },
     )
 
+
+def has_platform_access(user):
+    """
+    Determine whether a user currently has ChamaPlus platform access.
+
+    Free access:
+    - Django superusers, including isac12
+    - System Administrators
+    - The current active Treasurer of an active Chama
+
+    Regular members:
+    - Valid 14-day trial
+    - Approved platform payment
+    """
+
+    if not user.is_authenticated:
+        return False
+
+    profile = getattr(user, "profile", None)
+
+    if profile is None:
+        return False
+
+    # Superusers are permanently free.
+    if user.is_superuser:
+        return True
+
+    # System Administrators are permanently free.
+    if profile.role == UserProfile.Role.ADMIN:
+        return True
+
+    # Only the CURRENT active Chama Treasurer is permanently free.
+    current_treasurer = Membership.objects.filter(
+        user=user,
+        role=Membership.Role.TREASURER,
+        is_active=True,
+        chama__is_active=True,
+    ).exists()
+
+    if current_treasurer:
+        return True
+
+    now = timezone.now()
+
+    # Regular member still inside the 14-day trial.
+    if (
+        profile.trial_expires_at
+        and now <= profile.trial_expires_at
+    ):
+        return True
+
+    # Regular member who has paid for platform access.
+    if profile.platform_access_paid:
+        if (
+            profile.access_expires_at
+            and now > profile.access_expires_at
+        ):
+            if profile.access_active:
+                profile.access_active = False
+                profile.save(
+                    update_fields=[
+                        "access_active",
+                        "updated_at",
+                    ]
+                )
+
+            return False
+
+        return True
+
+    # access_active alone must never bypass subscription rules.
+    if profile.access_active:
+        profile.access_active = False
+        profile.save(
+            update_fields=[
+                "access_active",
+                "updated_at",
+            ]
+        )
+
+    return False
+
+
 @login_required
 def subscription(request):
     profile = request.user.profile
+
+    is_system_admin = (
+        request.user.is_superuser
+        or profile.role == UserProfile.Role.ADMIN
+    )
+
+    is_current_treasurer = Membership.objects.filter(
+        user=request.user,
+        role=Membership.Role.TREASURER,
+        is_active=True,
+        chama__is_active=True,
+    ).exists()
+
+    has_access = has_platform_access(request.user)
 
     return render(
         request,
         "accounts/subscription.html",
         {
             "profile": profile,
+            "has_access": has_access,
+            "is_system_admin": is_system_admin,
+            "is_current_treasurer": is_current_treasurer,
         },
     )
 
 
 @login_required
 def dashboard(request):
+    if not has_platform_access(request.user):
+        messages.warning(
+            request,
+            "Please complete your ChamaPlus subscription before continuing.",
+        )
+        return redirect("subscription")
+
     membership = (
         Membership.objects
         .filter(
@@ -265,5 +375,9 @@ def dashboard(request):
     return render(
         request,
         "dashboard.html",
+        {
+            "chama_membership": membership,
+        },
     )
+
 

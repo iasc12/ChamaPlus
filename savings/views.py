@@ -11,6 +11,16 @@ from chamas.models import Chama, Membership
 from .models import Saving, WithdrawalRequest
 
 
+def withdrawals_are_open():
+    """
+    Savings withdrawals remain closed until the Annual General Meeting.
+
+    This is intentionally centralized so both the member withdrawal
+    request and Treasurer approval logic use the same rule.
+    """
+    return False
+
+
 def can_record_savings(user):
     """
     Only the Treasurer of the active Chama can record savings.
@@ -118,7 +128,6 @@ def savings_dashboard(request):
 
     next_saturday = get_next_saturday()
 
-    is_december = timezone.localdate().month == 12
 
     withdrawal_requests = (
         WithdrawalRequest.objects
@@ -136,7 +145,6 @@ def savings_dashboard(request):
             "available_balance": available_balance,
             "can_record": can_record_savings(request.user),
             "next_saturday": next_saturday,
-            "is_december": is_december,
             "withdrawal_requests": withdrawal_requests,
         },
     )
@@ -269,9 +277,11 @@ def record_saving(request):
 @login_required
 def request_withdrawal(request):
     """
-    Allow any active Chama member to request a savings withdrawal.
+    Display the savings withdrawal page for every active Chama member.
 
-    Withdrawals are only available during December.
+    Withdrawals remain closed until the Annual General Meeting.
+    The page is intentionally accessible so members can see the
+    current withdrawal status.
     """
     chama = Chama.objects.filter(is_active=True).first()
 
@@ -295,17 +305,37 @@ def request_withdrawal(request):
         )
         return redirect("savings")
 
-    if timezone.localdate().month != 12:
-        messages.error(
-            request,
-            "Savings withdrawals are only available during December.",
-        )
-        return redirect("savings")
-
     available_balance = get_member_balance(
         request.user,
         chama,
     )
+
+    withdrawals_open = withdrawals_are_open()
+
+    if not withdrawals_open:
+        return render(
+            request,
+            "savings/withdraw.html",
+            {
+                "chama": chama,
+                "available_balance": available_balance,
+                "withdrawals_open": False,
+            },
+        )
+
+    # Withdrawals remain closed until the Annual General Meeting.
+    withdrawals_open = False
+
+    if not withdrawals_open:
+        return render(
+            request,
+            "savings/withdraw.html",
+            {
+                "chama": chama,
+                "available_balance": available_balance,
+                "withdrawals_open": False,
+            },
+        )
 
     if request.method == "POST":
         amount = request.POST.get("amount", "").strip()
@@ -329,6 +359,7 @@ def request_withdrawal(request):
                 {
                     "chama": chama,
                     "available_balance": available_balance,
+                    "withdrawals_open": True,
                 },
             )
 
@@ -347,6 +378,7 @@ def request_withdrawal(request):
                 {
                     "chama": chama,
                     "available_balance": available_balance,
+                    "withdrawals_open": True,
                 },
             )
 
@@ -373,6 +405,7 @@ def request_withdrawal(request):
         {
             "chama": chama,
             "available_balance": available_balance,
+            "withdrawals_open": True,
         },
     )
 
@@ -458,17 +491,17 @@ def approve_withdrawal(request, withdrawal_id):
     if request.method != "POST":
         return redirect("manage_withdrawals")
 
+    if not withdrawals_are_open():
+        messages.error(
+            request,
+            "Savings withdrawals cannot be approved until after the Annual General Meeting.",
+        )
+        return redirect("manage_withdrawals")
+
     if withdrawal.status != WithdrawalRequest.Status.PENDING:
         messages.error(
             request,
             "This withdrawal request has already been reviewed.",
-        )
-        return redirect("manage_withdrawals")
-
-    if timezone.localdate().month != 12:
-        messages.error(
-            request,
-            "Savings withdrawals can only be approved during December.",
         )
         return redirect("manage_withdrawals")
 

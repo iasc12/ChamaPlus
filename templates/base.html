@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,6 +6,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ChamaPlus Progressive Web App -->
+    <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+    <meta name="theme-color" content="#0b5ed7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ChamaPlus">
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="{% static 'pwa/icon-192.png' %}"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="{% static 'pwa/icon-192.png' %}"
+    >
 
     <title>
         {% block title %}ChamaPlus{% endblock %}
@@ -1061,7 +1081,7 @@
 
 <style>
 /* =========================================================
-   ChamaPlus â€” Universal Back Button
+   ChamaPlus Ã¢â‚¬â€ Universal Back Button
    ========================================================= */
 
 .chama-back-button {
@@ -1353,3 +1373,4 @@
 </body>
 
 </html>
+

@@ -329,17 +329,6 @@ def create_treasurer(request):
                 ]
             )
 
-        if hasattr(user, "profile"):
-
-            user.profile.role = "TREASURER"
-
-            user.profile.save(
-                update_fields=[
-                    "role",
-                    "updated_at",
-                ]
-            )
-
         chama.treasurer = user
 
         chama.save(
@@ -376,10 +365,10 @@ def treasurer_dashboard(request):
         )
         return redirect("dashboard")
 
-    if not is_committee_member(request.user, chama):
+    if not is_treasurer(request.user, chama):
         messages.error(
             request,
-            "Only Chama committee members can access this dashboard.",
+            "Only the current Chama Treasurer can access the Treasurer Dashboard.",
         )
         return redirect("dashboard")
 

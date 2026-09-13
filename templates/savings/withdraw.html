@@ -1,153 +1,198 @@
 ﻿{% extends "base.html" %}
 
-{% block title %}Request Withdrawal - ChamaPlus{% endblock %}
+{% block title %}Withdraw Savings - ChamaPlus{% endblock %}
 
 {% block content %}
-    {% include "components/back_button.html" with back_url_name="savings" back_label="Back" %}
 
-
-<div style="max-width:760px;margin:0 auto;">
-
-    <div style="margin-bottom:24px;">
-        <a
-            href="{% url 'savings' %}"
-            style="
-                display:inline-flex;
-                align-items:center;
-                gap:8px;
-                padding:10px 16px;
-                border:1px solid #d0d5dd;
-                border-radius:10px;
-                background:#fff;
-                color:#172033;
-                text-decoration:none;
-                font-weight:700;
-            "
-        >
-
-        </a>
-    </div>
+<div style="
+    max-width:760px;
+    margin:40px auto;
+    padding:0 20px;
+">
 
     <div style="
         background:#fff;
-        border:1px solid #e4e7ec;
+        border:1px solid #eaecf0;
         border-radius:18px;
-        padding:30px;
-        box-shadow:0 8px 24px rgba(16,24,40,.06);
+        padding:32px;
+        box-shadow:0 8px 30px rgba(16,24,40,.06);
     ">
 
-        <h1 style="margin:0 0 8px;">Request Savings Withdrawal</h1>
-
-        <p style="color:#667085;margin-top:0;">
-            Withdrawals are available only during December.
-        </p>
-
-        <div style="
-            margin:24px 0;
-            padding:18px;
-            border-radius:14px;
-            background:#f8fafc;
-        ">
-            <div style="font-size:13px;color:#667085;">
-                Available Savings
-            </div>
+        {% if not withdrawals_open %}
 
             <div style="
-                margin-top:5px;
-                font-size:28px;
-                font-weight:800;
-                color:#101828;
+                text-align:center;
+                padding:30px 15px;
             ">
-                KSh {{ available_balance|floatformat:2 }}
+
+                <div style="
+                    width:64px;
+                    height:64px;
+                    margin:0 auto 18px;
+                    border-radius:50%;
+                    background:#fff7ed;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:30px;
+                ">
+                    🔒
+                </div>
+
+                <h1 style="
+                    margin:0 0 12px;
+                    color:#172033;
+                    font-size:28px;
+                ">
+                    Savings Withdrawals Are Closed
+                </h1>
+
+                <p style="
+                    margin:0 auto;
+                    max-width:560px;
+                    color:#667085;
+                    font-size:15px;
+                    line-height:1.7;
+                ">
+                    Withdrawal requests are currently unavailable.
+                    Savings withdrawals will become available after
+                    the Annual General Meeting.
+                </p>
+
+                <div style="
+                    margin:24px auto 0;
+                    padding:16px 18px;
+                    max-width:560px;
+                    border-radius:12px;
+                    background:#fff7ed;
+                    color:#9a3412;
+                    text-align:left;
+                    line-height:1.6;
+                ">
+                    <strong>Your savings are safe.</strong>
+                    <br>
+                    Your recorded savings remain in your Chama account
+                    and continue to be available for viewing.
+                </div>
+
+                <div style="
+                    margin-top:26px;
+                    display:flex;
+                    justify-content:center;
+                    gap:10px;
+                    flex-wrap:wrap;
+                ">
+
+                    <a
+                        href="{% url 'savings' %}"
+                        style="
+                            display:inline-flex;
+                            align-items:center;
+                            justify-content:center;
+                            padding:12px 20px;
+                            border-radius:10px;
+                            background:#111827;
+                            color:#fff;
+                            text-decoration:none;
+                            font-weight:800;
+                        "
+                    >
+                        Back to Savings
+                    </a>
+
+                    <a
+                        href="{% url 'withdrawal_history' %}"
+                        style="
+                            display:inline-flex;
+                            align-items:center;
+                            justify-content:center;
+                            padding:12px 20px;
+                            border-radius:10px;
+                            border:1px solid #d0d5dd;
+                            background:#fff;
+                            color:#172033;
+                            text-decoration:none;
+                            font-weight:700;
+                        "
+                    >
+                        Withdrawal History
+                    </a>
+
+                </div>
+
             </div>
-        </div>
-
-        {% if available_balance > 0 %}
-
-        <form method="post">
-            {% csrf_token %}
-
-            <div style="margin-bottom:20px;">
-                <label
-                    for="amount"
-                    style="
-                        display:block;
-                        margin-bottom:8px;
-                        font-weight:700;
-                    "
-                >
-                    Withdrawal Amount
-                </label>
-
-                <input
-                    type="number"
-                    id="amount"
-                    name="amount"
-                    min="0.01"
-                    max="{{ available_balance }}"
-                    step="0.01"
-                    required
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:13px 14px;
-                        border:1px solid #d0d5dd;
-                        border-radius:10px;
-                        font-size:15px;
-                    "
-                >
-            </div>
-
-            <div style="margin-bottom:22px;">
-                <label
-                    for="reason"
-                    style="
-                        display:block;
-                        margin-bottom:8px;
-                        font-weight:700;
-                    "
-                >
-                    Reason <span style="color:#98a2b3;">(optional)</span>
-                </label>
-
-                <textarea
-                    id="reason"
-                    name="reason"
-                    rows="4"
-                    placeholder="Why are you requesting the withdrawal?"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:13px 14px;
-                        border:1px solid #d0d5dd;
-                        border-radius:10px;
-                        font-size:15px;
-                        resize:vertical;
-                    "
-                ></textarea>
-            </div>
-
-            <button
-                type="submit"
-                class="btn btn-dark"
-                style="width:100%;"
-            >
-                Submit Withdrawal Request
-            </button>
-        </form>
 
         {% else %}
 
-        <div style="
-            padding:18px;
-            border-radius:12px;
-            background:#fef3f2;
-            color:#b42318;
-            font-weight:600;
-        ">
-            You do not currently have enough available savings to request
-            a withdrawal.
-        </div>
+            <h1 style="margin:0 0 8px;">
+                Request Savings Withdrawal
+            </h1>
+
+            <p style="color:#667085;">
+                Available balance:
+                <strong>KSh {{ available_balance|floatformat:2 }}</strong>
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div style="margin-top:24px;">
+                    <label style="font-weight:700;">
+                        Withdrawal Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="1"
+                        step="0.01"
+                        required
+                        style="
+                            width:100%;
+                            padding:12px;
+                            margin-top:7px;
+                            border:1px solid #d0d5dd;
+                            border-radius:10px;
+                        "
+                    >
+                </div>
+
+                <div style="margin-top:20px;">
+                    <label style="font-weight:700;">
+                        Reason
+                    </label>
+
+                    <textarea
+                        name="reason"
+                        rows="4"
+                        placeholder="Why are you requesting the withdrawal?"
+                        style="
+                            width:100%;
+                            padding:12px;
+                            margin-top:7px;
+                            border:1px solid #d0d5dd;
+                            border-radius:10px;
+                        "
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    style="
+                        margin-top:22px;
+                        padding:12px 20px;
+                        border:0;
+                        border-radius:10px;
+                        background:#111827;
+                        color:#fff;
+                        font-weight:800;
+                        cursor:pointer;
+                    "
+                >
+                    Submit Withdrawal Request
+                </button>
+
+            </form>
 
         {% endif %}
 
@@ -156,7 +201,3 @@
 </div>
 
 {% endblock %}
-
-
-
-
