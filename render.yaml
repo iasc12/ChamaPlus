@@ -1,4 +1,4 @@
-﻿services:
+services:
   - type: web
     name: chamaplus
     runtime: python
@@ -20,7 +20,7 @@
         value: ".onrender.com"
 
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        value: "https://chamaplus.onrender.com"
+        value: "https://chamaplus-u4us.onrender.com"
 
       - key: DATABASE_URL
         sync: false

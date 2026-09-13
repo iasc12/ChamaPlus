@@ -1,4 +1,4 @@
-from datetime import timedelta
+﻿from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from chamas.models import Membership
+from chamas.models import Chama, Membership
 
 from .models import UserProfile
 
@@ -78,6 +78,18 @@ def register(request):
             trial_started_at=now,
             trial_expires_at=now + timedelta(days=14),
             access_active=True,
+        )
+
+        chama = Chama.objects.get(
+            name="ChamaPlus",
+            is_active=True,
+        )
+
+        Membership.objects.create(
+            chama=chama,
+            user=user,
+            role=Membership.Role.MEMBER,
+            is_active=True,
         )
 
         login(request, user)
@@ -379,5 +391,6 @@ def dashboard(request):
             "chama_membership": membership,
         },
     )
+
 
 
