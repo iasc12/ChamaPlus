@@ -1,0 +1,29 @@
+﻿services:
+  - type: web
+    name: chamaplus
+    runtime: python
+    plan: free
+    branch: master
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+
+      - key: DJANGO_DEBUG
+        value: "False"
+
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://chamaplus.onrender.com"
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chamaplus-db
+          property: connectionString
+
+databases:
+  - name: chamaplus-db
+    plan: free

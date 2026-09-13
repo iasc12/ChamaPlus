@@ -33,3 +33,6 @@ temp_*
 *.sqlite3-journal
 *.sqlite3-wal
 *.sqlite3-shm
+
+# Django collected static files
+staticfiles/
